@@ -18,15 +18,39 @@ import java.io.IOException;
  */
 public class Methods {
 
+    public static String leftAlignFormatTitulo() {
+        //Distance format for the table
+        String leftAlignFormat = "\t"
+                + "|"
+                + " %-" + Integer.toString(6 - 1) + "s"
+                + "|"
+                + " %-" + Integer.toString(40 - 1) + "s"
+                + "|"
+                + " %-" + Integer.toString(6 - 1) + "s"
+                + "|"
+                + " %-" + Integer.toString(10 - 1) + "s"
+                + "|"
+                + "  %-" + Integer.toString(10 - 1) + "s" //string
+                + "|"
+                + "  %-" + Integer.toString(10 - 1) + "s" //double con dos decimales
+                + "|\n";
+        return leftAlignFormat;
+    }
     public static String leftAlignFormat() {
         //Distance format for the table
         String leftAlignFormat = "\n\t"
                 + "|"
-                + " %-" + Integer.toString(50 - 1) + "s"
+                + " %-" + Integer.toString(6 - 1) + "s"
                 + "|"
-                + "  %-" + Integer.toString(9 - 1) + "s"
+                + " %-" + Integer.toString(40 - 1) + "s"
                 + "|"
-                + "  %-" + Integer.toString(9 - 1) + "s"
+                + " %-" + Integer.toString(6 - 1) + "s"
+                + "|"
+                + " %-" + Integer.toString(10 - 1) + "s"
+                + "|"
+                + "  %-" + Integer.toString(10 - 1) + "s" //string
+                + "|"
+                + "  %-" + Integer.toString(10 - 1) + ".2f" //double con dos decimales
                 + "|\n";
         return leftAlignFormat;
     }

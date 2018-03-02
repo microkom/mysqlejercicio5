@@ -12,13 +12,13 @@ import static mysqlejercicio5.Methods.*;
 /**
  * Crear una aplicación que conecte con la BBDD de Tienda y que cree en una
  * carpeta llamada “Pedidos” una carpeta para cliente con pedidos realizados con
- * el “IdCliente” como nombre de la carpeta.
- *
- * Dentro de la carpeta de cada cliente debe existir un fichero de texto (.txt)
- * para cada pedido con el número del pedido como nombre y con la información
- * del pedido como contenido. La información del pedido es número de pedido,
- * fecha, las líneas del pedido (nº de línea, nombre del producto, cantidad,
- * precio, y descuento) y el importe total + iva
+ * el “IdCliente” como nombre de la carpeta. Pedidos/Idcliente/numPedido.txt -->
+ * numPedido - fecha --> nº linea , nombre, cantidad, precio, desc, iva -->
+ * total + iva Dentro de la carpeta con nombre de idCliente debe existir un
+ * fichero de texto (.txt) para cada pedido con el número del pedido como nombre
+ * y con la información del pedido como contenido. La información del pedido es
+ * número de pedido, fecha, las líneas del pedido (nº de línea, nombre del
+ * producto, cantidad, precio, y descuento) y el importe total + iva
  */
 public class Main {
 
@@ -27,13 +27,15 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        final String LINE = "\t+" + line(50, "-") + line(10, "-") + line(10, "-");
+        final String SINGLE_LINE = "\t+" + line(89, "-");
+        final String LINE = "\t+" + line(6, "-") + line(40, "-") + line(6, "-") + line(10, "-") + line(11, "-") + line(11, "-");
 
         Conexion login = new Conexion();
         Connection con = null;
         PreparedStatement stmt = null;
         PreparedStatement stmt2 = null;
         PreparedStatement stmt3 = null;
+        PreparedStatement stmt4 = null;
 
         try {
             //conexión a la base de datos
@@ -48,29 +50,50 @@ public class Main {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                String nombreFolder = rs.getString(1);
-                File folderIdCliente = new File(folderPedidos, nombreFolder);
+                String idCliente = rs.getString(1);
+                File folderIdCliente = new File(folderPedidos, idCliente);
                 createFolder(folderIdCliente);
 
                 //consulta para sacar nº de pedido que se usa como nombre de archivo txt 
                 stmt2 = con.prepareStatement("SELECT * FROM pedidos WHERE cliente=?");
-                stmt2.setString(1, nombreFolder);
+                stmt2.setString(1, idCliente);
                 ResultSet rs2 = stmt2.executeQuery();
 
                 File fileIdPedido = null;
                 while (rs2.next()) {
+                    //info de pedido: numPedido y fecha
+                    String fechaPedido = rs2.getString(4);
                     String numPedido = rs2.getString(1);
                     fileIdPedido = new File(folderIdCliente, numPedido + ".txt");
 
-                    stmt3 = con.prepareStatement("SELECT * FROM lineaspedido where NumPedido=?");
+                    stmt3 = con.prepareStatement("SELECT l.NumLinea, p.NomProducto, l.Cantidad, l.Precio,l.Descuento from lineaspedido l join productos p on (l.Producto=p.IdProducto) where l.NumPedido=?");
                     stmt3.setString(1, numPedido);
                     ResultSet rs3 = stmt3.executeQuery();
-                    String text = "";
-                    while (rs3.next()){
-                        text += rs3.getInt(3)+" ";
-                        writeFile(fileIdPedido, text );  
+
+                    //encabezado 
+                    String text = SINGLE_LINE + "\n";
+                    text += String.format("\t| %-20s %-20s %-30s %-15s|", "FECHA PEDIDO: ", fechaPedido, "NUMERO PEDIDO: ", numPedido);
+                    text += "\n" + SINGLE_LINE + "\n";
+                    text += String.format(leftAlignFormatTitulo(), "Item", "Nombre", "CANT", "PRECIO", "DESC", "IVA");
+                    //contenido del archivo
+                    text += LINE;
+                    double ivaItem = 0;
+                    double ivaTotal = 0;
+                    double subTotal = 0;
+                    while (rs3.next()) {
+                        ivaItem = (rs3.getDouble("Precio") * rs3.getDouble("Cantidad") * 0.21);
+                        ivaTotal += ivaItem;
+                        subTotal += rs3.getDouble("Precio");
+                        text += String.format(leftAlignFormat(), rs3.getInt(1), rs3.getString(2), rs3.getDouble("Cantidad"), rs3.getDouble("Precio"), rs3.getDouble("Descuento"), ivaItem, "\n");
+                        text += LINE;
                     }
                     
+                    String finalText = String.format("\n\t| %-15s %-25s %-15s %-30.2f|", "SUBTOTAL: ", subTotal, "TOTAL + IVA: ", subTotal+ivaTotal);
+                    
+                    text += finalText;
+                    text += "\n" + SINGLE_LINE + "\n";
+                    
+                    writeFile(fileIdPedido, text);
                 }
 
             }
