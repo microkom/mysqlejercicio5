@@ -72,7 +72,7 @@ public class Main {
 
                     //encabezado 
                     String text = SINGLE_LINE + "\n";
-                    text += String.format("\t| %-20s %-20s %-30s %-15s|", "FECHA PEDIDO: ", fechaPedido, "NUMERO PEDIDO: ", numPedido);
+                    text += String.format("\t| %-12s %-28s %-15s %-28s|", "FECHA PEDIDO: ", fechaPedido, "NUMERO PEDIDO: ", numPedido);
                     text += "\n" + SINGLE_LINE + "\n";
                     text += String.format(leftAlignFormatTitulo(), "Item", "Nombre", "CANT", "PRECIO", "DESC", "IVA");
                     //contenido del archivo
@@ -83,12 +83,12 @@ public class Main {
                     while (rs3.next()) {
                         ivaItem = (rs3.getDouble("Precio") * rs3.getDouble("Cantidad") * 0.21);
                         ivaTotal += ivaItem;
-                        subTotal += rs3.getDouble("Precio");
+                        subTotal += rs3.getDouble("Precio")* rs3.getDouble("Cantidad");
                         text += String.format(leftAlignFormat(), rs3.getInt(1), rs3.getString(2), rs3.getDouble("Cantidad"), rs3.getDouble("Precio"), rs3.getDouble("Descuento"), ivaItem, "\n");
                         text += LINE;
                     }
                     
-                    String finalText = String.format("\n\t| %-15s %-25s %-15s %-30.2f|", "SUBTOTAL: ", subTotal, "TOTAL + IVA: ", subTotal+ivaTotal);
+                    String finalText = String.format("\n\t| %-10s %-25.2f %-5s %-13.2f %-8s %-22.2f|", "SUBTOTAL: ", subTotal, "IVA: ",ivaTotal, "TOTAL: ", subTotal+ivaTotal);
                     
                     text += finalText;
                     text += "\n" + SINGLE_LINE + "\n";
