@@ -5,6 +5,7 @@
  */
 package mysqlejercicio5;
 
+import com.mysql.jdbc.StringUtils;
 import java.sql.*;
 import java.io.*;
 import static mysqlejercicio5.Methods.*;
@@ -35,18 +36,19 @@ public class Main {
         PreparedStatement stmt = null;
         PreparedStatement stmt2 = null;
         PreparedStatement stmt3 = null;
-        PreparedStatement stmt4 = null;
-
+        
         try {
             //conexión a la base de datos
             con = login.conectar();
 
             //crear carpeta Pedidos
             File folderPedidos = new File("Pedidos");
-            createFolder(folderPedidos);
+           createFolder(folderPedidos);
 
+            //wipeFolderContentsTwoLevels(folderPedidos);
+            
             //consulta de idcliente
-            stmt = con.prepareStatement("select DISTINCT cliente from pedidos ");
+            stmt = con.prepareStatement("select DISTINCT cliente from Pedidos ");
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -55,7 +57,7 @@ public class Main {
                 createFolder(folderIdCliente);
 
                 //consulta para sacar nº de pedido que se usa como nombre de archivo txt 
-                stmt2 = con.prepareStatement("SELECT * FROM pedidos WHERE cliente=?");
+                stmt2 = con.prepareStatement("SELECT * FROM Pedidos WHERE cliente=?");
                 stmt2.setString(1, idCliente);
                 ResultSet rs2 = stmt2.executeQuery();
 
@@ -66,15 +68,16 @@ public class Main {
                     String numPedido = rs2.getString(1);
                     fileIdPedido = new File(folderIdCliente, numPedido + ".txt");
 
-                    stmt3 = con.prepareStatement("SELECT l.NumLinea, p.NomProducto, l.Cantidad, l.Precio,l.Descuento from lineaspedido l join productos p on (l.Producto=p.IdProducto) where l.NumPedido=?");
+                    stmt3 = con.prepareStatement("SELECT l.NumLinea, p.NomProducto, l.Cantidad, l.Precio,l.Descuento from LineasPedido l join Productos p on (l.Producto=p.IdProducto) where l.NumPedido=?");
                     stmt3.setString(1, numPedido);
                     ResultSet rs3 = stmt3.executeQuery();
 
                     //encabezado 
                     String text = SINGLE_LINE + "\n";
-                    text += String.format("\t| %-12s %-28s %-15s %-28s|", "FECHA PEDIDO: ", fechaPedido, "NUMERO PEDIDO: ", numPedido);
+                    text += String.format("\t| %12s %-28s %15s %-28s|", "FECHA PEDIDO: ", fechaPedido, "NUMERO PEDIDO: ", numPedido);
                     text += "\n" + SINGLE_LINE + "\n";
                     text += String.format(leftAlignFormatTitulo(), "Item", "Nombre", "CANT", "PRECIO", "DESC", "IVA");
+                    
                     //contenido del archivo
                     text += LINE;
                     double ivaItem = 0;

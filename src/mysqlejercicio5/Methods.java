@@ -19,38 +19,40 @@ import java.io.IOException;
 public class Methods {
 
     public static String leftAlignFormatTitulo() {
+
         //Distance format for the table
         String leftAlignFormat = "\t"
                 + "|"
-                + " %-" + Integer.toString(6 - 1) + "s"
+                + " %-" + Integer.toString(5) + "s"
                 + "|"
-                + " %-" + Integer.toString(40 - 1) + "s"
+                + " %-" + Integer.toString(39) + "s"
                 + "|"
-                + " %-" + Integer.toString(6 - 1) + "s"
+                + " %-" + Integer.toString(5) + "s"
                 + "|"
-                + " %-" + Integer.toString(10 - 1) + "s"
+                + " %-" + Integer.toString(9) + "s"
                 + "|"
-                + "  %-" + Integer.toString(10 - 1) + "s" //string
+                + "  %-" + Integer.toString(9) + "s" //string
                 + "|"
-                + "  %-" + Integer.toString(10 - 1) + "s" //double con dos decimales
+                + "  %-" + Integer.toString(9) + "s" //double con dos decimales
                 + "|\n";
         return leftAlignFormat;
     }
+
     public static String leftAlignFormat() {
         //Distance format for the table
         String leftAlignFormat = "\n\t"
                 + "|"
-                + " %-" + Integer.toString(6 - 1) + "s"
+                + " %" + Integer.toString(4) + "s "
                 + "|"
-                + " %-" + Integer.toString(40 - 1) + "s"
+                + " %-" + Integer.toString(39) + "s"
                 + "|"
-                + " %-" + Integer.toString(6 - 1) + "s"
+                + " %" + Integer.toString(4) + "s "
                 + "|"
-                + " %-" + Integer.toString(10 - 1) + "s"
+                + " %" + Integer.toString(8) + "s "
                 + "|"
-                + "  %-" + Integer.toString(10 - 1) + "s" //string
+                + " %" + Integer.toString(9) + "s " //string
                 + "|"
-                + "  %-" + Integer.toString(10 - 1) + ".2f" //double con dos decimales
+                + " %" + Integer.toString(9) + ".2f " //double con dos decimales
                 + "|\n";
         return leftAlignFormat;
     }
@@ -92,8 +94,11 @@ public class Methods {
                 System.out.println(e.getMessage());
             } finally {
                 try {
-                    if (fileToWrite != null) {
+                    if (bufferWillWrite != null) {
                         bufferWillWrite.close();
+                    }
+                    if (fileToWrite != null) {
+                        fileToWrite.close();
                     }
                 } catch (Exception er) {
                     System.out.println(er.getMessage());
@@ -172,9 +177,27 @@ public class Methods {
         }
     }
 
+    public static void wipeFolderContentsTwoLevels(File dir) {
+        //Deletes a folder content
+
+        try {
+            String[] entries = dir.list();
+            for (String s : entries) {
+                File levelOneFile = new File(dir.getPath(), s);
+                String[] entries2 = levelOneFile.list();
+                for (String s2 : entries2) {
+                    File currentFile2 = new File(levelOneFile.getPath(), s2);
+                    currentFile2.delete();
+                }levelOneFile.delete();
+            }dir.delete();
+            
+        } catch (SecurityException se) {
+            System.out.println(se.getMessage());
+        }
+    }
+
     public static void createFolder(File dir) {
         //Creates a folder
-        
 
         if (dir.exists() && dir.isDirectory()) {
             // Directory erase

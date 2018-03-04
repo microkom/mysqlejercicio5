@@ -14,6 +14,7 @@ import java.sql.DriverManager;
  */
 public class Conexion {
     public Connection conectar(){
+        
         final String ROJO = "\033[31;1m";
         final String VERDE = "\033[32m";
         final String RESET = "\033[0m";
@@ -23,7 +24,7 @@ public class Conexion {
             Class.forName("com.mysql.jdbc.Driver");
             String url="jdbc:mysql://localhost/tienda";
             String user="root";
-            String pass="";
+            String pass="123";
             con = DriverManager.getConnection(url, user, pass);
             System.out.println(VERDE+"\tConexión establecida\n\n"+RESET);
         }
